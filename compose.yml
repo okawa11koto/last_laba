@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  loadbalancer:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - core-service
+      - user-service
+
+  core-service:
+    image: alpine:latest
+    command: /app/core-service
+    volumes:
+      - ./bin/core-service:/app/core-service
+    networks:
+      - backend
+
+  user-service:
+    image: alpine:latest
+    command: /app/user-service
+    volumes:
+      - ./bin/user-service:/app/user-service
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
